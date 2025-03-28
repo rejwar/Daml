@@ -1,0 +1,35 @@
+module SmartContract where
+
+template Asset
+  with
+    Owner : Party
+    AssetName : Text
+    AssetValue : Decimal
+  where
+    signatory Owner
+    precondition
+      AssetValue > 0.0
+
+    controller Owner can
+      nonconsuming TransferOwnership
+        with
+          NewOwner : Party
+        do
+          create this with Owner = NewOwner
+
+template Marketplace
+  with
+    Seller : Party
+    Buyer : Party
+    ListedAsset : Asset
+    Price : Decimal
+  where
+    signatory Seller
+    observer Buyer
+    precondition
+      Price == ListedAsset.AssetValue
+
+    controller Buyer can
+      consuming BuyAsset
+        do
+          create ListedAsset with Owner = Buyer
